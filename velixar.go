@@ -145,6 +145,9 @@ func (e *APIError) Error() string {
 
 // do executes an HTTP request.
 func (c *Client) do(ctx context.Context, method, path string, body interface{}) ([]byte, error) {
+	if len(path) < 4 || path[:4] != "/v1/" {
+		path = "/v1" + path // live API is /v1-prefixed; server router normalizes identically
+	}
 	var bodyReader io.Reader
 	if body != nil {
 		b, err := json.Marshal(body)
