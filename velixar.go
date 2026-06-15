@@ -261,8 +261,11 @@ func (c *Client) List(ctx context.Context, limit int) (*SearchResult, error) {
 
 // GraphTraverse walks relationships from an entity.
 func (c *Client) GraphTraverse(ctx context.Context, entity string, depth int) (*TraverseResult, error) {
-	v := url.Values{"entity": {entity}, "depth": {strconv.Itoa(depth)}}
-	data, err := c.do(ctx, "GET", "/v1/graph/traverse?"+v.Encode(), nil)
+	maxHops := depth
+	if maxHops > 10 {
+		maxHops = 10
+	}
+	data, err := c.do(ctx, "POST", "/graph/traverse", map[string]interface{}{"entity": entity, "max_hops": maxHops})
 	if err != nil {
 		return nil, err
 	}
